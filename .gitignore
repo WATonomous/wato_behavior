@@ -1,0 +1,15 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+metadrive/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Cache
+__pycache__/

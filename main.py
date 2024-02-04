@@ -18,8 +18,8 @@ def make_env(rank, num_env):
         env = BehaviourEnv(dict(
             traffic_mode="trigger",
             num_scenarios=num_env,
-            start_seed=rank,
-            ), window=False) 
+            start_seed=rank
+            )) 
         env.reset(seed=rank)
         return env
 
@@ -28,27 +28,40 @@ def make_env(rank, num_env):
 # For getting number of cpus
 from multiprocessing import cpu_count
 
-# Import PyTorch for custom policy networks
+# Import torch to define policy arch
 import torch
 
 # Training Function
-def train(learning_rate, timesteps, policy='MlpPolicy', policy_kwargs=None, model_name=None):
-    if policy_kwargs == None:
-        raise ValueError("Policy Network Architecture Not Specified")
-
+def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='auto'):
     # Create the parallelized vectorized environment
     # Number of process CANNOT exceed number of cpus
-    env = SubprocVecEnv([make_env(rank=i, num_env=NUM_CPU) for i in range(NUM_CPU)]) 
-    
-    # Create Model 
-    if model_name == None:
-        model = SAC(policy=policy, env=env, learning_rate=learning_rate, 
-                    policy_kwargs=policy_kwargs, 
-                    buffer_size=1000)
-                    # tensorboard_log='./behaviour')
-    else:
-        model = SAC.load(model_name)
+    env = SubprocVecEnv([make_env(rank=i, num_env=NUM_CPU) for i in range(NUM_CPU)])
 
+    # define custom network architecture
+    policy_network_arch = dict(
+        activation_fn=torch.nn.ReLU,
+        net_arch=dict(
+            pi=[128, 64, 32],
+            qf=[128, 64, 32]
+        )
+    ) 
+
+    # Create Model 
+    model = SAC(
+        policy=policy, 
+        env=env, 
+        learning_rate=learning_rate, 
+        policy_kwargs=policy_network_arch, 
+        tensorboard_log='./behaviour', 
+        buffer_size=10000,
+        ent_coef=explore_exploit_coeff,
+        target_entropy=0.4
+        )
+    
+    # Load existing model
+    # model = SAC.load(MODEL_NAME)
+    # model.set_env(env)
+    # model.target_entropy = 0.2
 
     model.learn(total_timesteps=timesteps)
     
@@ -58,10 +71,8 @@ def train(learning_rate, timesteps, policy='MlpPolicy', policy_kwargs=None, mode
 def test(model_name, timesteps=10000):
     model = SAC.load(model_name)
     env = BehaviourEnv(dict(
-        traffic_mode="trigger",
-        num_scenarios=900,
-        start_seed=600
-        ), window=True) 
+        traffic_mode="trigger"
+        ), window=False) 
     obs, info = env.reset()
     for i in range(timesteps):
         action, _ = model.predict(observation=obs)
@@ -70,34 +81,20 @@ def test(model_name, timesteps=10000):
              obs, info = env.reset()
     env.close()
 
-def getSavedModel(model_name):
-    return SAC.load(model_name)
-
-
 # Define constants
-# NUM_CPU defines the number of concurrent instances to run when training 
-# (should not exceed the number of cpus)
-NUM_CPU = cpu_count() - 2
-# NUM_CPU=1
-LEARNING_RATE=0.0003
-TRAINING_TIMESTEPS=50000
+NUM_CPU = cpu_count() - 3
+LEARNING_RATE=0.0002
+TRAINING_TIMESTEPS=100000
 MODEL_NAME='sac_model'
 
-if __name__ == '__main__':
-    # Currently the actor and critic networks are 3 32 neuron layers
-    policy_network_arch = dict(
-        activation_fn=torch.nn.ReLU,
-        net_arch=dict(
-            pi=[32, 32, 32],
-            qf=[32, 32, 32]
-        ),
-        normalize_images=False
-    )
-    model = train(
-        policy='MlpPolicy',
-        learning_rate=LEARNING_RATE,
-        timesteps=TRAINING_TIMESTEPS, 
-        policy_kwargs=policy_network_arch)
-    model.save(MODEL_NAME)
 
+if __name__ == '__main__':
+    model = train(
+        policy='MlpPolicy', 
+        learning_rate=LEARNING_RATE, 
+        timesteps=TRAINING_TIMESTEPS)
+    model.save(MODEL_NAME)
+    print("done training")
     # test(model_name=MODEL_NAME)
+
+

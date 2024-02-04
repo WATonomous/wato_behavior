@@ -1,2 +1,3 @@
 stable-baselines3
 tensorboard
+do-mpc

@@ -13,3 +13,7 @@ metadrive/
 
 # Cache
 __pycache__/
+
+# Ignore tensorboard and model files
+*.zip
+behaviour_board/

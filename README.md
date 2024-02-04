@@ -1,7 +1,12 @@
 # wato_behavior
 Behavior model for WATO ASD Stack
 
-# Dependency setup steps
+# Running on WATO server
+1. Go (cd) into wato_behaviour repo
+2. Run `docker build -t wato_behavior:latest .` if not built yet
+3. Run `docker run --name wato_behaviour wato_behavior:latest`
+
+# Dependency setup steps (for local setup)
 1. Create virtual environment (name it venv): `python -m venv venv`
 2. Activate virtual environment: `venv\Scripts\activate.bat`
 3. Install metadrive env: 

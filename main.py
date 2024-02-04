@@ -52,7 +52,7 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
         env=env, 
         learning_rate=learning_rate, 
         policy_kwargs=policy_network_arch, 
-        tensorboard_log='./behaviour', 
+        tensorboard_log='./behaviour_board', 
         buffer_size=10000,
         ent_coef=explore_exploit_coeff,
         target_entropy=0.4

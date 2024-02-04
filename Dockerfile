@@ -2,7 +2,7 @@ FROM python:3.8.16-slim-bullseye
 
 COPY . /home/bolty/wato_behaviour
 
-WORKDIR /home/bolty/wato_behaviour
+WORKDIR /home/bolty
 
 RUN apt-get -y update && apt-get install -y git libglib2.0-0  \
 libsm6 libxrender1 libxext6 libgl1 libgl1-mesa-glx

@@ -4,7 +4,7 @@ Behavior model for WATO ASD Stack
 # Running on WATO server
 1. Go (cd) into wato_behaviour repo
 2. Run `docker build -t wato_behavior:latest .` if not built yet
-3. Run `docker run --name wato_behaviour wato_behavior:latest`
+3. Run `docker run --name wato_behaviour -d -v "$(pwd):/home/bolty/wato_behaviour" wato_behavior:latest`
 
 # Dependency setup steps (for local setup)
 1. Create virtual environment (name it venv): `python -m venv venv`

@@ -41,8 +41,8 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
     policy_network_arch = dict(
         activation_fn=torch.nn.ReLU,
         net_arch=dict(
-            pi=[128, 64, 32],
-            qf=[128, 64, 32]
+            pi=[1024, 512, 256, 128, 64, 32],
+            qf=[1024, 512, 256, 128, 64, 32]
         )
     ) 
 
@@ -55,7 +55,7 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
         tensorboard_log='./behaviour_board', 
         buffer_size=10000,
         ent_coef=explore_exploit_coeff,
-        target_entropy=0.4
+        target_entropy=0.2
         )
     
     # Load existing model
@@ -84,7 +84,7 @@ def test(model_name, timesteps=10000):
 # Define constants
 NUM_CPU = cpu_count() - 3
 LEARNING_RATE=0.0002
-TRAINING_TIMESTEPS=100000
+TRAINING_TIMESTEPS=2000000
 MODEL_NAME='sac_model'
 
 

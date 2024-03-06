@@ -6,6 +6,9 @@ from stable_baselines3 import SAC
 
 # For vectorizing the environment
 from stable_baselines3.common.vec_env import SubprocVecEnv
+
+from MoEEnv import MoEEnv
+
 def make_env(rank, num_env):
     """
     Utility function for multiprocessed env.
@@ -19,7 +22,7 @@ def make_env(rank, num_env):
             traffic_mode="trigger",
             num_scenarios=num_env,
             start_seed=rank
-            )) 
+            ), window=True) 
         env.reset(seed=rank)
         return env
 
@@ -41,9 +44,10 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
     policy_network_arch = dict(
         activation_fn=torch.nn.ReLU,
         net_arch=dict(
-            pi=[1024, 512, 256, 128, 64, 32],
-            qf=[1024, 512, 256, 128, 64, 32]
-        )
+            pi=[128, 64, 32],
+            qf=[128, 64, 32]
+        ),
+        normalize_images=False
     ) 
 
     # Create Model 
@@ -55,7 +59,7 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
         tensorboard_log='./behaviour_board', 
         buffer_size=10000,
         ent_coef=explore_exploit_coeff,
-        target_entropy=0.2
+        target_entropy=0.4
         )
     
     # Load existing model
@@ -68,33 +72,60 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
     env.close()
     return model
 
+# Function for testing saved model
 def test(model_name, timesteps=10000):
     model = SAC.load(model_name)
     env = BehaviourEnv(dict(
-        traffic_mode="trigger"
-        ), window=False) 
+        traffic_mode="trigger",
+        num_scenarios=100
+        ), window=True) 
     obs, info = env.reset()
     for i in range(timesteps):
         action, _ = model.predict(observation=obs)
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated or truncated:
              obs, info = env.reset()
+        # draw_multi_channels_top_down_observation(np.transpose(obs))
+    # env.top_down_renderer.generate_gif()
+    env.close()
+
+from PIL import Image
+from metadrive.metadrive.examples.top_down_metadrive import draw_multi_channels_top_down_observation
+
+import numpy as np
+import random
+
+# Test the environment by just having the car go straight
+def test_env():
+    env = MoEEnv(dict(
+        traffic_mode="respawn",
+        num_scenarios=100
+        ), window=True) 
+    obs, info = env.reset()
+    for i in range(10000):
+        action = [[0, 0, -0.6]]
+        obs, reward, terminated, truncated, info = env.step(action)
+        if terminated or truncated:
+            obs, info = env.reset()
+        # draw_multi_channels_top_down_observation(obs)
+    # env.top_down_renderer.generate_gif()
     env.close()
 
 # Define constants
 NUM_CPU = cpu_count() - 3
 LEARNING_RATE=0.0002
-TRAINING_TIMESTEPS=2000000
+TRAINING_TIMESTEPS=100000
 MODEL_NAME='sac_model'
 
 
 if __name__ == '__main__':
-    model = train(
-        policy='MlpPolicy', 
-        learning_rate=LEARNING_RATE, 
-        timesteps=TRAINING_TIMESTEPS)
-    model.save(MODEL_NAME)
-    print("done training")
+    # model = train(
+    #     policy='CnnPolicy', 
+    #     learning_rate=LEARNING_RATE, 
+    #     timesteps=TRAINING_TIMESTEPS)
+    # model.save(MODEL_NAME)
+    # print("done training")
     # test(model_name=MODEL_NAME)
+    test_env()
 
 

@@ -56,12 +56,12 @@ class MPCController:
         self.mpc.bounds['lower','_x', 'x_pos'] = 0.0
         # mpc.bounds['lower','_x', 'y_pos'] = -100.0
         self.mpc.bounds['lower','_x', 'theta'] = -0.5*np.pi
-        # mpc.bounds['lower','_x', 'vel'] = 0.0
+        # self.mpc.bounds['lower','_x', 'vel'] = 1.0
         # # Upper bounds on states
         # mpc.bounds['upper','_x', 'x_pos'] = 100.0
         # mpc.bounds['upper','_x', 'y_pos'] = 100.0
         self.mpc.bounds['upper','_x', 'theta'] = 0.5*np.pi
-        # mpc.bounds['upper','_x', 'vel'] = 100.0
+        # self.mpc.bounds['upper','_x', 'vel'] = 80.0
 
         # # Lower bounds on inputs:
         self.mpc.bounds['lower','_u', 'accel_set'] = -1.0
@@ -103,12 +103,12 @@ class MPCController:
 
         # Define objective function
         # mterm is the cost at the end of the horizon (time step n)
-        mterm = (10*(self.y_pos - (
+        mterm = (5.0*(self.y_pos - (
             coeffs[0][0]*(self.x_pos**3) + 
             coeffs[1][0]*(self.x_pos**2) + 
             coeffs[2][0]*self.x_pos + 
             coeffs[3][0]))**2 + 
-            (self.vel - target_vel)**2 + 
+            5.0*(self.vel - target_vel)**2 + 
             (self.theta - atan(
             derivative_coeffs[0][0]*(self.x_pos**2) + 
             derivative_coeffs[1][0]*(self.x_pos**1) + 
@@ -119,7 +119,7 @@ class MPCController:
             coeffs[1][0]*(self.x_pos**2) + 
             coeffs[2][0]*self.x_pos + 
             coeffs[3][0]))**2 +
-            (2**(-self.vel))*2
+            (2**(-self.vel))
             # + (self.theta - atan(
             # derivative_coeffs[0][0]*(self.x_pos**2) + 
             # derivative_coeffs[1][0]*(self.x_pos**1) + 

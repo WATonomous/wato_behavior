@@ -32,18 +32,12 @@ class BehaviourEnv(MetaDriveEnv):
         config["norm_pixel"] = False
         super().__init__(config)
 
-        print(self.observation_space)
+        # print(self.observation_space)
         self.prev_action = np.array([0, 0]).reshape(-1, 1)
 
     # Override action space to output 4 numbers
     @property
     def action_space(self):
-        # spaces_dict = {
-        #     'x_pos': Box(low=0.0, high=10.0),
-        #     'y_pos': Box(low=-5.0, high=-5.0),
-        #     'theta': Box(low=-np.pi/3.0, high=np.pi/3.0),
-        #     'vel': Box(low=0.0, high=10.0)
-        # }
         return Box(low=-1.0, high=1.0, shape=(1,3))
     
     def get_single_observation(self):

@@ -85,18 +85,16 @@ def test(model_name, timesteps=10000):
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated or truncated:
              obs, info = env.reset()
-        # draw_multi_channels_top_down_observation(np.transpose(obs))
     # env.top_down_renderer.generate_gif()
     env.close()
 
 from PIL import Image
-from metadrive.metadrive.examples.top_down_metadrive import draw_multi_channels_top_down_observation
 
 import numpy as np
 import random
 
-# Test the environment by just having the car go straight
-def test_env():
+# Currently working on testing moe_env
+def test_moe_env():
     env = MoEEnv(dict(
         traffic_mode="respawn",
         num_scenarios=100
@@ -107,7 +105,6 @@ def test_env():
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated or truncated:
             obs, info = env.reset()
-        # draw_multi_channels_top_down_observation(obs)
     # env.top_down_renderer.generate_gif()
     env.close()
 
@@ -126,6 +123,6 @@ if __name__ == '__main__':
     # model.save(MODEL_NAME)
     # print("done training")
     # test(model_name=MODEL_NAME)
-    test_env()
+    test_moe_env()
 
 

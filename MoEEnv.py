@@ -1,4 +1,5 @@
 # This file is to edit the MetaDriveEnv to render during step
+from TemporalMap import TemporalMap
 from metadrive.metadrive.envs import MetaDriveEnv
 from metadrive.metadrive.envs import TopDownMetaDrive
 
@@ -11,7 +12,7 @@ import numpy as np
 import math
 
 
-class MoEEnv(TopDownMetaDrive):
+class MoEEnv(MetaDriveEnv):
     # Override init to modify config
     def __init__(self, config, window=False):
         # Increase speed reward and driving reward from 0.1 to 0.5
@@ -51,7 +52,7 @@ class MoEEnv(TopDownMetaDrive):
         velocity_error = math.sqrt(self.vehicle.velocity[0]**2 + self.vehicle.velocity[1]**2) \
             - 10
         throttle = -velocity_error*0.05
-        print(throttle)
+        # print(throttle)
 
         obs, reward, terminated, truncated, info = super().step([steering, throttle])
 
@@ -76,6 +77,11 @@ class MoEEnv(TopDownMetaDrive):
             raise NotImplementedError
         elif model_ind == 2:
             raise NotImplementedError
+        
+    def get_single_observation(self):
+        return TemporalMap(
+            self.config["vehicle_config"]
+        )
 
 
     # Override the reward function

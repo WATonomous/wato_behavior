@@ -7,6 +7,7 @@ Behavior model for WATO ASD Stack
 3. Run `docker run --name wato_behaviour -d -v "$(pwd):/home/bolty/wato_behaviour" wato_behavior:latest`
 
 # Dependency setup steps (for local setup)
+Following steps are for command prompt
 1. Create virtual environment (name it venv): `python -m venv venv`
 2. Activate virtual environment: `venv\Scripts\activate.bat`
 3. Install metadrive env: 
@@ -16,9 +17,10 @@ cd metadrive
 pip install -e .
 ```
 4. Go back to project directory: `cd ..`
-4. Install other dependencies: `pip install -r requirements.txt`
+5. Pull metadrive assets with `python -m metadrive.pull_asset --update`
+6. Install other dependencies: `pip install -r requirements.txt`
 
 # Tasks to do 
-- Change action space to output a trajectory (spline? line?) instead of raw controls
-- Implement traditional control algorithm (mpc? pid?) to follow a set path for possible some kind of on-policy imitation learning/behaviour cloning
+- Improve occupancy grid emulation (add naive temporal element)
+- Try implementing quasi-"Mixture Of Experts" model
 - Think of random ideas to try

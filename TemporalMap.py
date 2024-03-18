@@ -10,6 +10,13 @@ from metadrive.metadrive.obs.top_down_obs_impl import ObjectGraphics
 from metadrive.metadrive.constants import DEFAULT_AGENT
 from metadrive.metadrive.obs.top_down_obs_impl import COLOR_BLACK
 
+#for plotting
+import matplotlib 
+
+def plot_temporal_map(tempMap: np.array): #function to plot the temporal map
+    matplotlib.pyplot.imshow(tempMap[0])
+    matplotlib.pyplot.show() #this blocks the vehicle simulation until window is closed
+       
 class TemporalMap(TopDownMultiChannel):
     def __init__(
         self, 
@@ -30,6 +37,11 @@ class TemporalMap(TopDownMultiChannel):
     @property
     def observation_space(self):
         return Box(low=0, high=1.0, shape=(1, 128, 128))
+    
+    def draw_points(self, tempMap, probabilities): #function to plot the temporal map, expects tempMap to be n x 2 where n is the number of points and probabilities n x 1
+        for indx, point in enumerate(tempMap): #in-progress
+            color = probabilities[indx] * 256
+            pygame.draw.lines(self.canvas_runtime, (color, color, color), False, [point, point])  #needs to be updated to draw circle
     
     def draw_scene(self):
         # Set the active area that can be modify to accelerate
@@ -73,6 +85,9 @@ class TemporalMap(TopDownMultiChannel):
 
             pygame.draw.lines(self.canvas_runtime, (110, 110, 110), False, [arrow_start, arrow_end], width=arrow_width)
             pygame.draw.lines(self.canvas_runtime, (110, 110, 110), False, [end_line1, end_line2], width=arrow_width)
+            #pygame.draw.rect(self.canvas_runtime, (0, 0, 255), pygame.Rect(10, 10, 100, 100)) not visible on plot
+
+                    
 
         # Prepare a runtime canvas for rotation
         return self.obs_window.render(canvas_dict=dict(
@@ -88,8 +103,11 @@ class TemporalMap(TopDownMultiChannel):
 
         # Mirror occupancy grid horizontally (makes more sense)
         obs_new = np.clip(obs[..., 0] - np.clip(obs[..., 2], 0, 0.5019608), 0, 1)
-        return np.array([np.transpose(obs_new)])
+        tempMap = np.array([np.transpose(obs_new)])
+        pygame.draw.rect(self.canvas_runtime, (0, 0, 255), pygame.Rect(10, 10, 100, 100))
+        plot_temporal_map(tempMap)
+        
+        return tempMap
 
         
-
 

@@ -94,7 +94,7 @@ import numpy as np
 import random
 
 # Currently working on testing moe_env
-def test_moe_env():
+def test__env():
     env = MoEEnv(dict(
         traffic_mode="respawn",
         num_scenarios=100
@@ -107,6 +107,22 @@ def test_moe_env():
             obs, info = env.reset()
     # env.top_down_renderer.generate_gif()
     env.close()
+    
+# like moe_env but has the temporal map observation and uses behaviourenv
+def test_behaviour_env():
+    env = BehaviourEnv(dict(
+        traffic_mode="respawn",
+        num_scenarios=100
+        ), window=True) 
+    obs, info = env.reset()
+    for i in range(10000):
+        action = [[0, 0, -0.6]]
+        obs, reward, terminated, truncated, info = env.step(action)
+        if terminated or truncated:
+            obs, info = env.reset()
+    # env.top_down_renderer.generate_gif()
+    env.close()
+    
 
 # Define constants
 NUM_CPU = cpu_count() - 3
@@ -123,6 +139,6 @@ if __name__ == '__main__':
     # model.save(MODEL_NAME)
     # print("done training")
     # test(model_name=MODEL_NAME)
-    test_moe_env()
-
+    #test_moe_env()
+    test_behaviour_env()  
 

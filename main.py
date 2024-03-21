@@ -9,6 +9,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv
 
 from MoEEnv import MoEEnv
 
+totalTime = 0
+
 def make_env(rank, num_env):
     """
     Utility function for multiprocessed env.

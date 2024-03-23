@@ -110,15 +110,23 @@ def test__env():
     # env.top_down_renderer.generate_gif()
     env.close()
     
+#from metadrive.metadrive.component.map.base_map import BaseMap
+#from metadrive.metadrive.component.map.pg_map import MapGenerateMethod
+#map_config={BaseMap.GENERATE_TYPE: MapGenerateMethod.BIG_BLOCK_SEQUENCE, 
+#            BaseMap.GENERATE_CONFIG: "C",  # 3 block
+#            BaseMap.LANE_WIDTH: 3.5,
+#            BaseMap.LANE_NUM: 2}
+
 # like moe_env but has the temporal map observation and uses behaviourenv
 def test_behaviour_env():
     env = BehaviourEnv(dict(
         traffic_mode="respawn",
-        num_scenarios=100
+        num_scenarios=100,
+        #map_config=map_config,
         ), window=True) 
     obs, info = env.reset()
     for i in range(10000):
-        action = [[0, 0, -0.6]]
+        action = [[0, 0, -0.7]]
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated or truncated:
             obs, info = env.reset()

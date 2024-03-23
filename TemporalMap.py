@@ -12,8 +12,10 @@ from metadrive.metadrive.obs.top_down_obs_impl import COLOR_BLACK
 
 import matplotlib 
 
+import random
+
 def plot_temporal_map(tempMap: np.array): #function to plot the temporal map
-    matplotlib.pyplot.imshow(tempMap[0], cmap="viridis") #cmap="magma" has a fuller color range but looks worse
+    matplotlib.pyplot.imshow(tempMap[0], cmap="bone") #cmap="magma" has a fuller color range but looks worse
     matplotlib.pyplot.show() #this blocks the vehicle simulation until window is closed   
        
 class TemporalMap(TopDownMultiChannel):
@@ -91,10 +93,9 @@ class TemporalMap(TopDownMultiChannel):
             prob_arr = np.empty((1,1),dtype=float)
             
             for x_car in range(w):  #calculate points and probabilities for temporal map
-                start_point = pygame.math.Vector2(h/2, -w/2+x_car).rotate(angle) + position  #calculate the end point
-                moving_point = start_point
+                start_point = pygame.math.Vector2(h/2, -w/2+x_car).rotate(angle) + position  
                 for y_car in range(int(y_dim_length)):
-                    moving_point.x += 1
+                    moving_point = start_point + pygame.math.Vector2(y_car, 0).rotate(angle)
                     prob = -1/int(y_dim_length) * y_car + 1 
                     pos_arr = np.vstack([pos_arr, [moving_point.x, moving_point.y]])
                     prob_arr = np.vstack([prob_arr, [prob]])
@@ -116,7 +117,8 @@ class TemporalMap(TopDownMultiChannel):
         # Mirror occupancy grid horizontally (makes more sense)
         obs_new = np.clip(obs[..., 0] - np.clip(obs[..., 2], 0, 0.5019608), 0, 1)
         tempMap = np.array([np.transpose(obs_new)])
-        plot_temporal_map(tempMap) #this freezes the program
+        if(random.randint(0, 9) == 1):
+            plot_temporal_map(tempMap) #this freezes the program
         
         return tempMap
 

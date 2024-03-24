@@ -96,7 +96,7 @@ import numpy as np
 import random
 
 # Currently working on testing moe_env
-def test__env():
+def test_moe_env():
     env = MoEEnv(dict(
         traffic_mode="respawn",
         num_scenarios=100
@@ -149,6 +149,6 @@ if __name__ == '__main__':
     # model.save(MODEL_NAME)
     # print("done training")
     # test(model_name=MODEL_NAME)
-    #test_moe_env()
+    # test_moe_env()
     test_behaviour_env()  
 

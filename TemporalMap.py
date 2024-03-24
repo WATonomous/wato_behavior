@@ -116,7 +116,7 @@ class TemporalMap(TopDownMultiChannel):
 
         # Mirror occupancy grid horizontally (makes more sense)
         obs_new = np.clip(obs[..., 0] - np.clip(obs[..., 2], 0, 0.5019608), 0, 1)
-        tempMap = np.array([np.transpose(obs_new)])
+        tempMap = np.array([obs_new])
         if(random.randint(0, 9) == 1):
             plot_temporal_map(tempMap) #this freezes the program
         

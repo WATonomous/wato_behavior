@@ -95,15 +95,19 @@ from PIL import Image
 import numpy as np
 import random
 
+from metadrive.policy.expert_policy import ExpertPolicy
+
 # Currently working on testing moe_env
 def test_moe_env():
     env = MoEEnv(dict(
         traffic_mode="respawn",
-        num_scenarios=100
+        num_scenarios=100,
+        map = "SCOS",
+        # agent_policy=ExpertPolicy         # PPOExpert (takes care of lane keeping)
         ), window=True) 
     obs, info = env.reset()
     for i in range(10000):
-        action = [[0, 0, -0.6]]
+        action = [[0, 0, -0.6]]             # not used to for now (single model)
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated or truncated:
             obs, info = env.reset()
@@ -149,6 +153,6 @@ if __name__ == '__main__':
     # model.save(MODEL_NAME)
     # print("done training")
     # test(model_name=MODEL_NAME)
-    # test_moe_env()
+    # test_moe_env()                  # working on follow distance
     test_behaviour_env()  
 

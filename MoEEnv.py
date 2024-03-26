@@ -29,9 +29,25 @@ class MoEEnv(MetaDriveEnv):
     def action_space(self):
         return Discrete(4) # For now assume 4 models
 
+    def following_distance(self, target_vehicle):
+        min_dist = -1
+        for car in self.engine.traffic_manager.vehicles:
+            if car.id != target_vehicle.id:
+                if target_vehicle.lane.id[2] == car.lane.id[2]:
+                    
+                    cur_dist = target_vehicle.lane_distance_to(car, target_vehicle.lane)
+                    if (min_dist == -1 or cur_dist > min_dist) and cur_dist >= 0:
+                        min_dist = cur_dist
+                                    
+        return min_dist
 
     # Add render to the environment step
     def step(self, action):
+        follow = self.following_distance(self.vehicle)        
+        if (follow <= 0):
+            follow = 100000
+        follow = max(follow, 0.0000001)         # prevent div by 0
+                        
         # Get the chosen model
         model_ind = action
 
@@ -45,20 +61,22 @@ class MoEEnv(MetaDriveEnv):
         angle_error = self.vehicle.heading_theta - lane.heading_theta_at(long_pos + 0.1)
 
         # Steer the vehicle to minimize the angle error
-        steering = -angle_error
+        steering = -(angle_error * 3)
 
+        velocity = max(math.sqrt(self.vehicle.velocity[0]**2 + self.vehicle.velocity[1]**2), 0.0000001)
+        velocity_error = velocity - 10
+
+        follow_error = 1.5*(velocity**2+30)/(follow)
+        
         # Set throttle to maintain some speed
-        velocity_error = math.sqrt(self.vehicle.velocity[0]**2 + self.vehicle.velocity[1]**2) \
-            - 10
-        throttle = -velocity_error*0.05
-        # print(throttle)
+        throttle = -(velocity_error+follow_error)*0.1
 
         obs, reward, terminated, truncated, info = super().step([steering, throttle])
 
         out = self.render(mode="topdown",
             scaling=None,
             film_size=(500, 500),
-            screen_size=(2000, 500),
+            screen_size=(1500, 500),
             # target_vehicle_heading_up=True,
             camera_position=(0,0),
             screen_record=False,

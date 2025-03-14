@@ -22,7 +22,7 @@ def make_env(rank, num_env):
     def _init():
         env = BehaviourEnv(dict(
             traffic_mode="trigger",
-            num_scenarios=num_env,
+            num_scenarios=num_env*10,
             start_seed=rank
             ), window=True) 
         env.reset(seed=rank)
@@ -46,27 +46,28 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
     policy_network_arch = dict(
         activation_fn=torch.nn.ReLU,
         net_arch=dict(
-            pi=[128, 64, 32],
-            qf=[128, 64, 32]
+            pi=[2056, 514],
+            qf=[2056, 514]
         ),
         normalize_images=False
     ) 
 
     # Create Model 
-    model = SAC(
-        policy=policy, 
-        env=env, 
-        learning_rate=learning_rate, 
-        policy_kwargs=policy_network_arch, 
-        tensorboard_log='./behaviour_board', 
-        buffer_size=10000,
-        ent_coef=explore_exploit_coeff,
-        target_entropy=0.4
-        )
+    # model = SAC(
+    #     policy=policy, 
+    #     env=env, 
+    #     learning_rate=learning_rate, 
+    #     policy_kwargs=policy_network_arch, 
+    #     tensorboard_log='./behaviour_board', 
+    #     buffer_size=10000,
+    #     ent_coef=explore_exploit_coeff,
+    #     target_entropy=0.3,
+    #     device='cuda'
+    #     )
     
     # Load existing model
-    # model = SAC.load(MODEL_NAME)
-    # model.set_env(env)
+    model = SAC.load(MODEL_NAME, device='cuda')
+    model.set_env(env)
     # model.target_entropy = 0.2
 
     model.learn(total_timesteps=timesteps)
@@ -76,7 +77,7 @@ def train(learning_rate, timesteps, policy='MlpPolicy', explore_exploit_coeff='a
 
 # Function for testing saved model
 def test(model_name, timesteps=10000):
-    model = SAC.load(model_name)
+    model = SAC.load(model_name, device='cuda')
     env = BehaviourEnv(dict(
         traffic_mode="trigger",
         num_scenarios=100
@@ -135,20 +136,20 @@ def test_behaviour_env():
     
 
 # Define constants
-NUM_CPU = cpu_count() - 3
-LEARNING_RATE=0.0002
-TRAINING_TIMESTEPS=100000
+NUM_CPU = 12
+LEARNING_RATE=1e-4
+TRAINING_TIMESTEPS=1000000
 MODEL_NAME='sac_model'
 
 
 if __name__ == '__main__':
-    # model = train(
-    #     policy='CnnPolicy', 
-    #     learning_rate=LEARNING_RATE, 
-    #     timesteps=TRAINING_TIMESTEPS)
-    # model.save(MODEL_NAME)
-    # print("done training")
+    model = train(
+        policy='CnnPolicy', 
+        learning_rate=LEARNING_RATE, 
+        timesteps=TRAINING_TIMESTEPS)
+    model.save(MODEL_NAME)
+    print("done training")
     # test(model_name=MODEL_NAME)
     # test_moe_env()
-    test_behaviour_env()  
+    # test_behaviour_env()  
 

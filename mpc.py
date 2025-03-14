@@ -77,7 +77,7 @@ class MPCController:
         # self.mpc.scaling['_x', 'theta'] = 2
         # self.mpc.scaling['_u', 'accel_set'] = 2
 
-    def set_objective(self, polar_angle, target_theta, target_vel):
+    def set_objective(self, polar_angle, target_theta, target_vel, polar_radius=5.0):
         def interpolate_cubic_curve(point1, slope1, point2, slope2):
             x = np.array([point1[0], point2[0]])
             y = np.array([point1[1], point2[1]])
@@ -89,8 +89,8 @@ class MPCController:
         
         RADIUS = 5.0
 
-        target_x = RADIUS * math.cos(polar_angle)
-        target_y = RADIUS * math.sin(polar_angle)
+        target_x = polar_radius * math.cos(polar_angle)
+        target_y = polar_radius * math.sin(polar_angle)
 
         # print(target_x, target_y)
 

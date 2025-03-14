@@ -1,6 +1,6 @@
 # This file is to edit the MetaDriveEnv to render during step
 from TemporalMap import TemporalMap
-from metadrive.metadrive.envs import MetaDriveEnv
+from metadrive.envs import MetaDriveEnv
 # from metadrive.metadrive.envs import TopDownMetaDrive
 
 # from metadrive.metadrive.obs.top_down_obs_multi_channel import TopDownMultiChannel
@@ -22,8 +22,8 @@ class BehaviourEnv(MetaDriveEnv):
         config.update(new_config)
         
         # Increase speed reward and driving reward from 0.1 to 0.5
-        config["speed_reward"] = 0.5
-        config["driving_reward"] = 0.5
+        config["speed_reward"] = 0.2
+        config["driving_reward"] = 0.2
         config["traffic_density"] = 0.2
         # config["use_render"] = True
         self.window = window
@@ -38,7 +38,7 @@ class BehaviourEnv(MetaDriveEnv):
     # Override action space to output 4 numbers
     @property
     def action_space(self):
-        return Box(low=-1.0, high=1.0, shape=(1,3))
+        return Box(low=-1.0, high=1.0, shape=(1,4))
     
     def get_single_observation(self):
         return TemporalMap(
@@ -53,7 +53,8 @@ class BehaviourEnv(MetaDriveEnv):
         target_x, target_y = mpc_controller.set_objective(
             action[0][0] * np.pi/3.0,
             action[0][1] * np.pi/3.0,
-            (action[0][2] + 1.0) * 30.0
+            (action[0][2] + 1.0) * 30.0,
+            polar_radius=2.5*(action[0][3] + 1.0)
             )
         mpc = mpc_controller.mpc
         cur_vel = self.agent.velocity
@@ -89,16 +90,16 @@ class BehaviourEnv(MetaDriveEnv):
                 break
             i += 1
             
-            out = self.render(mode="topdown",
-            scaling=None,
-            film_size=(500, 500),
-            screen_size=(2000, 500),
-            # target_vehicle_heading_up=True,
-            camera_position=(0,0),
-            screen_record=False,
-            window=self.window,
-            text={"episode_step": self.engine.episode_step,
-                    "mode": "Trigger"})
+            # out = self.render(mode="topdown",
+            # scaling=None,
+            # film_size=(500, 500),
+            # screen_size=(2000, 500),
+            # # target_vehicle_heading_up=True,
+            # camera_position=(0,0),
+            # screen_record=False,
+            # window=self.window,
+            # text={"episode_step": self.engine.episode_step,
+            #         "mode": "Trigger"})
             
         self.prev_action = np.copy(u0)
 

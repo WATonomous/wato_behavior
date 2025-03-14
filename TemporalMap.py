@@ -1,14 +1,14 @@
-from metadrive.metadrive.component.vehicle.base_vehicle import BaseVehicle
-from metadrive.metadrive.obs.top_down_obs_multi_channel import TopDownMultiChannel
+from metadrive.component.vehicle.base_vehicle import BaseVehicle
+from metadrive.obs.top_down_obs_multi_channel import TopDownMultiChannel
 
 import numpy as np
 from gymnasium.spaces import Box
 
 import pygame
-from metadrive.metadrive.obs.top_down_obs_impl import ObjectGraphics
+from metadrive.obs.top_down_obs_impl import ObjectGraphics
 
-from metadrive.metadrive.constants import DEFAULT_AGENT
-from metadrive.metadrive.obs.top_down_obs_impl import COLOR_BLACK
+from metadrive.constants import DEFAULT_AGENT
+from metadrive.obs.top_down_obs_impl import COLOR_BLACK
 
 import matplotlib 
 
@@ -117,8 +117,8 @@ class TemporalMap(TopDownMultiChannel):
         # Mirror occupancy grid horizontally (makes more sense)
         obs_new = np.clip(obs[..., 0] - np.clip(obs[..., 2], 0, 0.5019608), 0, 1)
         tempMap = np.array([obs_new])
-        if(random.randint(0, 9) == 1):
-            plot_temporal_map(tempMap) #this freezes the program
+        # if(random.randint(0, 9) == 1):
+        #     plot_temporal_map(tempMap) #this freezes the program
         
         return tempMap
 

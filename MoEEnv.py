@@ -1,6 +1,6 @@
 # This file is to edit the MetaDriveEnv to render during step
-from metadrive.metadrive.envs import MetaDriveEnv
-from metadrive.metadrive.envs import TopDownMetaDrive
+from metadrive.envs import MetaDriveEnv
+from metadrive.envs import TopDownMetaDrive
 
 from mpc import MPCController
 
